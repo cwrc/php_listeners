@@ -129,7 +129,7 @@ class Connect {
               }
               $output = $actionObj->{$classMethodName}($fedora_object->object);
               if (isset($output)) {
-                $this->log->lwrite("Complete: PID: $pid Class: $className $methodName", 'SERVER_INFO');
+                $this->log->lwrite("Complete: PID: $pid Class: $className $classMethodName", 'SERVER_INFO');
               }
             }
           }
