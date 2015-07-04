@@ -41,68 +41,38 @@
     </stomp>
     
     <derivatives>
-        <!-- In this section you can specify as many object elements as you
-             want. Each of these defines a set of rules that are used to filter
-             each message from the JMS broker and decide what actions, if any, 
-             should be triggered. If you don't specify a value for a particular
-             filter then all of the messages will pass through that filter. -->
+        <!-- 
+          In this section you can specify as many object elements as you
+          want. Each of these defines a set of rules that are used to filter
+          each message from the JMS broker and decide what actions, if any, 
+          should be triggered. If you don't specify a value for a particular
+          filter then all of the messages will pass through that filter. 
+        -->  
         <object>
-            <!-- Filter by namespace -->
-            <nameSpace>islandora</nameSpace>
-            <!-- Filter by the content model of the object -->
-            <contentModel>fedora-system:FedoraObject-3.0</contentModel>
             <!-- Filter on method (http://www.fedora-commons.org/documentation/3.0/userdocs/server/webservices/apim/index.html) -->
             <method>addDatastream</method>
-            <!-- Filter on the mimetype of the added/updated datastream -->
-            <extension>tif</extension>            
-            <!-- Filter on the datastream that has been added/updated -->
-            <trigger_datastream>TIFF</trigger_datastream>
-            <!-- Define which datastream to grab to create the derivatives. If 
-                 you want to create derivatives from more than one datastream 
-                 then create a second rule. -->
-            <datastream>TIFF</datastream>
-            <!-- This is a list of operations to perform on the datastream. 
-                 Currently these consist of a datastream ID (dsid), the label
-                 of the newly created datastream and the function that is used.
-                 The functions are defined in the Derivatives.php file. You can
-                 specify as many derivatives as you want. -->
+            <method>addRelationship</method>
+            <method>modifyObject</method>
+            <method>modifyDatastreamByReference</method>
+            <method>modifyDatastreamByValue</method>
+            <method>ingest</method>
+            <method></method>
+            <basexdb_server_url>localhost</basexdb_server_url>
+            <basexdb_server_port>1984</basexdb_server_port>
+            <basexdb_username></basexdb_username>
+            <basexdb_password></basexdb_password>
+            <basexdb_dbname></basexdb_dbname>                               
             <derivative>
-                <dsid>TN</dsid>
-                <label>Thumbnail</label>
-                <function>TN</function>
+              <!-- path to file - https://github.com/cwrc/islandora_cwrc_basexdb/tree/master/includes -->
+              <include_file>xmldb_basex.inc</include_file>
+              <!-- path to file - https://github.com/BaseXdb/basex/blob/master/basex-api/src/main/php/BaseXClient.php -->
+              <include_file>BaseXclient.php</include_file>
+              <class>xmldb_basex</class>
+              <classMethod>basexdb_add_content</classMethod>
             </derivative>
-            <derivative>
-                <dsid>JPG</dsid>
-                <label>JPEG image</label>
-                <function>JPG</function>
-            </derivative>
-            <derivative>
-                <dsid>JP2</dsid>
-                <label>Compressed jp2</label>
-                <function>JP2</function>
-            </derivative>  
-            <derivative>
-                <dsid>OCR</dsid>
-                <label>Scanned text</label>
-                <function>OCR</function>
-            </derivative>
-            <derivative>
-                <dsid>HOCR</dsid>
-                <label>HOCR</label>
-                <function>HOCR</function>
-            </derivative>  
-            <derivative>
-                <dsid>ENCODED_OCR</dsid>
-                <label>Encoded OCR</label>
-                <function>ENCODED_OCR</function>
-            </derivative>     
-            <derivative>
-                <dsid>TECHMD</dsid>
-                <label>Technical metadata</label>
-                <function>TECHMD</function>
-            </derivative> 
+             
         </object>
-        
+
     </derivatives>
     
     <log>

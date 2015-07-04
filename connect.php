@@ -61,10 +61,9 @@ class Connect {
       if ($this->msg != NULL) {
         $message = new Message($this->msg->body);
         $pid = $this->msg->headers['pid'];
-        if (!isset($message->dsID)) {
-          $message->dsID = NULL;
-        }
-        $this->log->lwrite("Method: " . $this->msg->headers['methodName'], 'MODIFY_OBJECT', $pid, $message->dsID, $message->author);
+        $modMethod = $this->msg->headers['methodName'];
+        $message_dsid = isset($message->dsID) ? $message->dsID : NULL;
+        $this->log->lwrite("Method: " . $modMethod, 'MODIFY_OBJECT', $pid, $message_dsid, $message->author);
         try {
           if (fedora_object_exists($this->fedora_url, $this->user, $pid) === FALSE) {
             $this->log->lwrite("Could not find object", 'DELETED_OBJECT', $pid, NULL, $message->author, 'ERROR');
@@ -74,8 +73,12 @@ class Connect {
           }
           $fedora_object = new ListenerObject($this->user, $this->fedora_url, $pid);
         } catch (Exception $e) {
-          $this->log->lwrite("An error occurred creating the fedora object", 'FAIL_OBJECT', $pid, NULL, $message->author, 'ERROR');
+          $this->log->lwrite("An error occurred accessing the fedora object", 'FAIL_OBJECT', $pid, NULL, $message->author, 'ERROR');
+          $this->con->ack($this->msg);
+          unset($this->msg);
+          return;
         }
+
         $properties = get_object_vars($message);
         $object_namespace_array = explode(':', $pid);
         $object_namespace = $object_namespace_array[0];
@@ -84,52 +87,52 @@ class Connect {
         foreach ($objects as $object) {
           $namespaces = $object->nameSpace;
           $content_models = $object->contentModel;
-          $xml_methods = $object->method;
-          $methods = array();
-          foreach ($xml_methods as $xml_method) {
-            $methods[] = (string) $xml_method[0];
+          
+          // build array of methods to filter upon 
+          $method_array = array();
+          foreach ($object->method as $item) {
+            $method_array[] = (string) $item[0];
           }
-          $datastream = $object->datastream;
-          $datastream = (string) $datastream[0];
-          $new_datastreams = $object->derivative;
-          $extension = $object->extension;
-          $extension = (string) $extension[0];
-          $trigger_datastreams = (array) $object->trigger_datastream;
-          foreach ($content_models as $content_model) {
-//            $this->log->lwrite('Content models: ' . implode(', ', $fedora_object->object->models), "SERVER_INFO");
-//            $this->log->lwrite('Config models: ' . $content_model, "SERVER_INFO");
-            if (in_array($content_model, $fedora_object->object->models)) {
-              foreach ($namespaces as $namespace) {
-//                $this->log->lwrite('Namespace: ' . $object_namespace, "SERVER_INFO");
-//                $this->log->lwrite('Config namespace: ' . $namespace, "SERVER_INFO");
-                if ((string) $namespace == (string) $object_namespace) {
-//                  $this->log->lwrite('Method: ' . $this->msg->headers['methodName'], "SERVER_INFO");
-//                  $this->log->lwrite('Config method: ' . implode(', ', $methods), "SERVER_INFO");
-                  if (in_array($this->msg->headers['methodName'], $methods)) {
-//                    $this->log->lwrite('Triggers: ' . $message->dsID, "SERVER_INFO");
-//                    $this->log->lwrite('Config triggers: ' . implode(', ', $trigger_datastreams), "SERVER_INFO");
-                    if (in_array($message->dsID, $trigger_datastreams) || $message->dsID == NULL) {
-                      $derivative = new Derivative($fedora_object, $datastream, $extension, $this->log, $message->dsID);
-                      foreach ($new_datastreams as $new_datastream) {
-//                      $this->log->lwrite("Adding datastream '$new_datastream->dsid' with label '$new_datastream->label' using function '$new_datastream->function'", 'START_DATASTREAM', $pid, $new_datastream->dsid, $message->author);
-                        $function = (string) $new_datastream->function;
-                        $derivative->{$function}((string) $new_datastream->dsid, (string) $new_datastream->label);
-                      }
-                    }
-                  }
-                }
+
+          // build array of include files to filter upon 
+          $include_array = array();
+          foreach ($object->derivative->include_file as $item) {
+            $include_array[] = (string) $item[0];
+          }
+          
+          $this->log->lwrite('Zzzz: ', "SERVER_INFO");
+
+          $this->log->lwrite('Config methods: ' . implode(', ', $method_array), "SERVER_INFO");
+
+          if (in_array($this->msg->headers['methodName'], $method_array)) {
+            $this->log->lwrite('Method: ' . $this->msg->headers['methodName'], "SERVER_INFO");
+
+            foreach ($include_array as $item)
+            {
+              include_once $item;
+              $this->log->lwrite('include: '.implode(', ', $include_array), "SERVER_INFO");
+            }
+
+            $className = (string) $object->derivative->class;
+            if (!class_exists($className))
+            {
+              $this->log->lwrite("Error loading class $className, check your config file", $pid, NULL, $message->author, 'ERROR');
+              continue;
+            }
+            else
+            {
+              $classMethodName = (string) $object->derivative->classMethod;
+              $actionObj = new $className($object,(string)$object->basexdb_dbname,$this->log);
+              if (!method_exists($actionObj, $classMethodName)) {
+                $this->log->lwrite("Error calling $className->$classMethodName, check your config file", $pid, NULL, $message->author, 'ERROR');
+                continue;
+              }
+              $output = $actionObj->{$classMethodName}($fedora_object->object);
+              if (isset($output)) {
+                $this->log->lwrite("Complete: PID: $pid Class: $className $methodName", 'SERVER_INFO');
               }
             }
           }
-          unset($namespaces);
-          unset($namespace);
-          unset($content_models);
-          unset($content_model);
-          unset($methods);
-          unset($datastream);
-          unset($new_datastreams);
-          unset($new_datastream);
-          unset($derivative);
         }
 
         // Mark the message as received in the queue
