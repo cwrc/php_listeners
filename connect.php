@@ -56,22 +56,29 @@ class Connect {
 
     // Receive a message from the queue
     if ($this->msg = $this->con->readFrame()) {
+
       $this->log->lwrite($this->msg->body, 'SERVER', NULL, NULL, NULL, 'INFO');
+
       // do what you want with the message
       if ($this->msg != NULL) {
         $message = new Message($this->msg->body);
         $pid = $this->msg->headers['pid'];
         $modMethod = $this->msg->headers['methodName'];
         $message_dsid = isset($message->dsID) ? $message->dsID : NULL;
+
         $this->log->lwrite("Method: " . $modMethod, 'MODIFY_OBJECT', $pid, $message_dsid, $message->author);
+
         try {
-          if (fedora_object_exists($this->fedora_url, $this->user, $pid) === FALSE) {
-            $this->log->lwrite("Could not find object", 'DELETED_OBJECT', $pid, NULL, $message->author, 'ERROR');
-            $this->con->ack($this->msg);
-            unset($this->msg);
-            return;
+          if ( $modMethod !== 'purgeObject' )
+          {
+            if (fedora_object_exists($this->fedora_url, $this->user, $pid) === FALSE) {
+              $this->log->lwrite("Could not find object", 'DELETED_OBJECT', $pid, NULL, $message->author, 'ERROR');
+              $this->con->ack($this->msg);
+              unset($this->msg);
+              return;
+            }
+            $fedora_object = new ListenerObject($this->user, $this->fedora_url, $pid);
           }
-          $fedora_object = new ListenerObject($this->user, $this->fedora_url, $pid);
         } catch (Exception $e) {
           $this->log->lwrite("An error occurred accessing the fedora object", 'FAIL_OBJECT', $pid, NULL, $message->author, 'ERROR');
           $this->con->ack($this->msg);
@@ -79,15 +86,13 @@ class Connect {
           return;
         }
 
-        $properties = get_object_vars($message);
-        $object_namespace_array = explode(':', $pid);
-        $object_namespace = $object_namespace_array[0];
+        //$properties = get_object_vars($message);
+        //$object_namespace_array = explode(':', $pid);
+        //$object_namespace = $object_namespace_array[0];
+
         $objects = $this->config_xml->xpath('//object');
 
         foreach ($objects as $object) {
-          $namespaces = $object->nameSpace;
-          $content_models = $object->contentModel;
-          
           // build array of methods to filter upon 
           $method_array = array();
           foreach ($object->method as $item) {
@@ -100,9 +105,7 @@ class Connect {
             $include_array[] = (string) $item[0];
           }
           
-          $this->log->lwrite('Zzzz: ', "SERVER_INFO");
-
-          $this->log->lwrite('Config methods: ' . implode(', ', $method_array), "SERVER_INFO");
+          //$this->log->lwrite('Config methods: ' . implode(', ', $method_array), "SERVER_INFO");
 
           if (in_array($this->msg->headers['methodName'], $method_array)) {
             $this->log->lwrite('Method: ' . $this->msg->headers['methodName'], "SERVER_INFO");
@@ -127,7 +130,14 @@ class Connect {
                 $this->log->lwrite("Error calling $className->$classMethodName, check your config file", $pid, NULL, $message->author, 'ERROR');
                 continue;
               }
-              $output = $actionObj->{$classMethodName}($fedora_object->object);
+              if ( $modMethod !== 'purgeObject' )
+              {
+                $output = $actionObj->{$classMethodName}($fedora_object->object);
+              }
+              else 
+              {
+                $output = $actionObj->{$classMethodName}($pid);
+              }
               if (isset($output)) {
                 $this->log->lwrite("Complete: PID: $pid Class: $className $classMethodName", 'SERVER_INFO');
               }
