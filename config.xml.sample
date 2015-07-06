@@ -48,7 +48,7 @@
           should be triggered. If you don't specify a value for a particular
           filter then all of the messages will pass through that filter. 
         -->  
-        <object>
+        <trigger>
             <!-- Filter on method (http://www.fedora-commons.org/documentation/3.0/userdocs/server/webservices/apim/index.html) -->
             <method>addDatastream</method>
             <method>addRelationship</method>
@@ -71,7 +71,7 @@
               <classMethod>basexdb_add_content</classMethod>
             </derivative>
              
-        </object>
+        </trigger>
 
     </derivatives>
     

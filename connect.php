@@ -90,18 +90,18 @@ class Connect {
         //$object_namespace_array = explode(':', $pid);
         //$object_namespace = $object_namespace_array[0];
 
-        $objects = $this->config_xml->xpath('//object');
+        $triggers = $this->config_xml->xpath('//trigger');
 
-        foreach ($objects as $object) {
+        foreach ($triggers as $trigger) {
           // build array of methods to filter upon 
           $method_array = array();
-          foreach ($object->method as $item) {
+          foreach ($trigger->method as $item) {
             $method_array[] = (string) $item[0];
           }
 
           // build array of include files to filter upon 
           $include_array = array();
-          foreach ($object->derivative->include_file as $item) {
+          foreach ($trigger->derivative->include_file as $item) {
             $include_array[] = (string) $item[0];
           }
           
@@ -115,7 +115,7 @@ class Connect {
               //$this->log->lwrite('include: '.implode(', ', $include_array), "SERVER_INFO");
             }
 
-            $className = (string) $object->derivative->class;
+            $className = (string) $trigger->derivative->class;
             if (!class_exists($className))
             {
               $this->log->lwrite("Error loading class $className, check your config file", $pid, NULL, $message->author, 'ERROR');
@@ -123,8 +123,8 @@ class Connect {
             }
             else
             {
-              $classMethodName = (string) $object->derivative->classMethod;
-              $actionObj = new $className($object,(string)$object->basexdb_dbname,$this->log);
+              $classMethodName = (string) $trigger->derivative->classMethod;
+              $actionObj = new $className($trigger,(string)$trigger->basexdb_dbname,$this->log);
               if (!method_exists($actionObj, $classMethodName)) {
                 $this->log->lwrite("Error calling $className->$classMethodName, check your config file", $pid, NULL, $message->author, 'ERROR');
                 continue;
