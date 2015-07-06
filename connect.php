@@ -57,7 +57,7 @@ class Connect {
     // Receive a message from the queue
     if ($this->msg = $this->con->readFrame()) {
 
-      $this->log->lwrite($this->msg->body, 'SERVER', NULL, NULL, NULL, 'INFO');
+      //$this->log->lwrite($this->msg->body, 'SERVER', NULL, NULL, NULL, 'INFO');
 
       // do what you want with the message
       if ($this->msg != NULL) {
@@ -66,7 +66,7 @@ class Connect {
         $modMethod = $this->msg->headers['methodName'];
         $message_dsid = isset($message->dsID) ? $message->dsID : NULL;
 
-        $this->log->lwrite("Method: " . $modMethod, 'MODIFY_OBJECT', $pid, $message_dsid, $message->author);
+        $this->log->lwrite("Method: " . $modMethod, 'SERVER_INFO', $pid, $message_dsid, $message->author);
 
         try {
           if ( $modMethod !== 'purgeObject' )
@@ -108,12 +108,11 @@ class Connect {
           //$this->log->lwrite('Config methods: ' . implode(', ', $method_array), "SERVER_INFO");
 
           if (in_array($this->msg->headers['methodName'], $method_array)) {
-            $this->log->lwrite('Method: ' . $this->msg->headers['methodName'], "SERVER_INFO");
 
             foreach ($include_array as $item)
             {
               include_once $item;
-              $this->log->lwrite('include: '.implode(', ', $include_array), "SERVER_INFO");
+              //$this->log->lwrite('include: '.implode(', ', $include_array), "SERVER_INFO");
             }
 
             $className = (string) $object->derivative->class;
@@ -139,8 +138,9 @@ class Connect {
                 $output = $actionObj->{$classMethodName}($pid);
               }
               if (isset($output)) {
-                $this->log->lwrite("Complete: PID: $pid Class: $className $classMethodName", 'SERVER_INFO');
+                $this->log->lwrite($output, 'SERVER_INFO');
               }
+              $this->log->lwrite("Complete: PID: $pid Class: $className $classMethodName", 'SERVER_INFO');
             }
           }
         }
