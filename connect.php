@@ -52,6 +52,11 @@ class Connect {
     }
   }
 
+  /**
+   * 
+   *
+   *
+   * */
   function listen() {
 
     // Receive a message from the queue
@@ -59,8 +64,9 @@ class Connect {
 
       //$this->log->lwrite($this->msg->body, 'SERVER', NULL, NULL, NULL, 'INFO');
 
-      // do what you want with the message
+      // based on the "trigger" within the config file, apply action 
       if ($this->msg != NULL) {
+
         $message = new Message($this->msg->body);
         $pid = $this->msg->headers['pid'];
         $modMethod = $this->msg->headers['methodName'];
@@ -68,6 +74,7 @@ class Connect {
 
         $this->log->lwrite("Method: " . $modMethod, 'SERVER_INFO', $pid, $message_dsid, $message->author);
 
+        // lookup Fedora Object
         try {
           if ( $modMethod !== 'purgeObject' )
           {
@@ -86,20 +93,19 @@ class Connect {
           return;
         }
 
-        //$properties = get_object_vars($message);
-        //$object_namespace_array = explode(':', $pid);
-        //$object_namespace = $object_namespace_array[0];
-
+        // load "trigger" details
         $triggers = $this->config_xml->xpath('//trigger');
 
+        // apply each trigger
         foreach ($triggers as $trigger) {
+
           // build array of methods to filter upon 
           $method_array = array();
           foreach ($trigger->method as $item) {
             $method_array[] = (string) $item[0];
           }
 
-          // build array of include files to filter upon 
+          // build array of include files to use while applying action 
           $include_array = array();
           foreach ($trigger->derivative->include_file as $item) {
             $include_array[] = (string) $item[0];
@@ -107,14 +113,17 @@ class Connect {
           
           //$this->log->lwrite('Config methods: ' . implode(', ', $method_array), "SERVER_INFO");
 
+          // filter by "method" within the JMS message and "trigger" configuration
           if (in_array($this->msg->headers['methodName'], $method_array)) {
 
+            // include required helper functions and class method
             foreach ($include_array as $item)
             {
               include_once $item;
               //$this->log->lwrite('include: '.implode(', ', $include_array), "SERVER_INFO");
             }
 
+            // call class method specifiec by trigger
             $className = (string) $trigger->derivative->class;
             if (!class_exists($className))
             {
