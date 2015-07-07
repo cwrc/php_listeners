@@ -23,6 +23,7 @@ class Message {
       $this->{$scheme[1]} = $term;
     }
     $this->title = (string) $this->xml->getElementsByTagName('title')->item(0)->nodeValue;
+    $this->updateTime = (string) $this->xml->getElementsByTagName('updated')->item(0)->nodeValue;
   }
   
 }

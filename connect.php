@@ -140,11 +140,11 @@ class Connect {
               }
               if ( $modMethod !== 'purgeObject' )
               {
-                $output = $actionObj->{$classMethodName}($fedora_object->object);
+                $output = $actionObj->{$classMethodName}($fedora_object->object,$message->updateTime);
               }
               else 
               {
-                $output = $actionObj->{$classMethodName}($pid);
+                $output = $actionObj->{$classMethodName}($pid,$message->updateTime);
               }
               if (isset($output)) {
                 $this->log->lwrite($output, 'SERVER_INFO');
