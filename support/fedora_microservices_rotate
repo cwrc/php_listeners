@@ -1,0 +1,9 @@
+#
+/data/BACKUP/logs/* {
+    weekly 
+    rotate 5
+    notifempty
+    missingok
+    compress
+}
+
