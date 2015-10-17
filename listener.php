@@ -10,8 +10,8 @@ fclose(STDIN);
 fclose(STDOUT);
 fclose(STDERR);
 $STDIN = fopen('/dev/null', 'r');
-$STDOUT = fopen('application.log', 'wb');
-$STDERR = fopen('error.log', 'wb');
+$STDOUT = fopen('logs/application.log', 'wb');
+$STDERR = fopen('logs/error.log', 'wb');
 
 $config_file = file_get_contents('config.xml');
 $config_xml = new SimpleXMLElement($config_file);

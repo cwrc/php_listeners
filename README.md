@@ -56,19 +56,20 @@ Installation instructions
 2\. Install the PHP-Pear framework and use this to install the PHP Stomp library.
 
 * CentOS: 
- * yum install php-pear
- * pecl channel-update pecl.php.net
- * pecl install Stomp
-* make sure the following are installed
- * yum install openssl
- * sudo yum install php-devel
- * sudo yum install openssl-devel.x86_64
+ * make sure the following are installed
+  * yum install openssl
+  * sudo yum install php-devel
+  * sudo yum install openssl-devel.x86_64
+  * yum install php-pear
+  * pecl channel-update pecl.php.net
+  * pecl install Stomp
+   * /etc/php.d/Stomp.ini
 
 
 
 3\. Copy the config.xml.sample to config.xml and update it to reflect your environment.
 
-4\. Start the listener by running "php listener.php" or "service fedora_microservices start" via the init.d script.
+4\. Start the listener by running "php listener.php" or "service fedora_microservices start" via the init.d script (sudo ln -s /opt/php_listeners/support/fedora_microservices /etc/init.d).
 
 5\. Ensure the firewall rules allow access from the Fedora server.
 

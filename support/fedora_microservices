@@ -19,7 +19,7 @@
 START_STOP_WAIT=5
 # change the lines below to match your use case
 # a user that can read and write to the LISTENER_DIR
-LISTENER_USER="microservices"
+LISTENER_USER="fedora"
 # the directory where the listeners are installed
 LISTENER_DIR="/opt/php_listeners"
 
