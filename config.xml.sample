@@ -56,7 +56,8 @@
             <method>modifyDatastreamByReference</method>
             <method>modifyDatastreamByValue</method>
             <method>ingest</method>
-            <method></method>
+            <method>purgeDatastream</method>
+            <method>purgeRelationship</method>
             <basexdb_server_url>localhost</basexdb_server_url>
             <basexdb_server_port>1984</basexdb_server_port>
             <basexdb_username></basexdb_username>
@@ -66,12 +67,32 @@
               <!-- path to file - https://github.com/cwrc/islandora_cwrc_basexdb/tree/master/includes -->
               <include_file>xmldb_basex.inc</include_file>
               <!-- path to file - https://github.com/BaseXdb/basex/blob/master/basex-api/src/main/php/BaseXClient.php -->
-              <include_file>BaseXclient.php</include_file>
+              <include_file>BaseXClient.php</include_file>
               <class>xmldb_basex</class>
               <classMethod>basexdb_add_content</classMethod>
             </derivative>
              
         </trigger>
+
+        <!-- delete XML Database item  -->
+        <trigger>
+            <!-- Filter on method (http://www.fedora-commons.org/documentation/3.0/userdocs/server/webservices/apim/index.html) -->
+            <method>purgeObject</method>
+            <basexdb_server_url></basexdb_server_url>
+            <basexdb_server_port>1984</basexdb_server_port>
+            <basexdb_username></basexdb_username>
+            <basexdb_password></basexdb_password>
+            <basexdb_dbname></basexdb_dbname>
+            <derivative>
+              <!-- path to file - https://github.com/cwrc/islandora_cwrc_basexdb/tree/master/includes -->
+              <include_file>xmldb_basex.inc</include_file>
+              <!-- path to file - https://github.com/BaseXdb/basex/blob/master/basex-api/src/main/php/BaseXClient.php -->
+              <include_file>BaseXClient.php</include_file>
+              <class>xmldb_basex</class>
+              <classMethod>basexdb_delete_content</classMethod>
+            </derivative>
+        </trigger>
+
 
     </derivatives>
     
