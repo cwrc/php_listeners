@@ -57,10 +57,9 @@ Installation instructions
 
 * CentOS: 
  * make sure the following are installed
-  * yum install openssl
+  * sudo yum install openssl openssl-devel.x86_64
   * sudo yum install php-devel
-  * sudo yum install openssl-devel.x86_64
-  * yum install php-pear
+  * sudo yum install php-pear
   * pecl channel-update pecl.php.net
   * pecl install Stomp
    * /etc/php.d/Stomp.ini

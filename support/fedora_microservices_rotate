@@ -1,7 +1,9 @@
 #
-/data/BACKUP/logs/* {
+/opt/php_listeners/logs/*.log {
     weekly 
-    rotate 5
+    rotate 50
+    copytruncate 
+    dateext
     notifempty
     missingok
     compress
