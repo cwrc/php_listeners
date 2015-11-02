@@ -68,7 +68,7 @@ Installation instructions
 
 3\. Copy the config.xml.sample to config.xml and update it to reflect your environment.  Also, may need to change the "include_file" directory and baexdb_server_url, basexdb_username, basexdb_password, and basexdb_dbname.
 
-4\. Start the listener by running "php listener.php" or "service fedora_microservices start" via the init.d script (sudo ln -s /opt/php_listeners/support/fedora_microservices /etc/init.d). May need to change the userid in fedora_microservices. Also, may need to change the file permissions. Also, setup the logrotate script.
+4\. Start the listener by running "php listener.php" or "service fedora_microservices start" via the init.d script (sudo ln -s /opt/php_listeners/support/fedora_microservices /etc/init.d). May need to change the userid in fedora_microservices. Also, may need to change the file permissions. Also, setup the logrotate script and have the init.d script start the microservice on server boot ('sudo chkconfig --add fedora_microservices').
 
 5\. Ensure the firewall rules allow access from the Fedora server.
 
