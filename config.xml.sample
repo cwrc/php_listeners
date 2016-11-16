@@ -111,6 +111,47 @@
             </derivative>
         </trigger>
 
+        <!-- create stub entity from an external URI -->
+        <!-- Filter on method (http://www.fedora-commons.org/documentation/3.0/userdocs/server/webservices/apim/index.html) -->
+        <trigger>
+            <method>addDatastream</method>
+            <method>addRelationship</method>
+            <method>modifyObject</method>
+            <method>modifyDatastreamByReference</method>
+            <method>modifyDatastreamByValue</method>
+            <method>ingest</method>
+            <method>purgeDatastream</method>
+            <method>purgeRelationship</method>
+            <drupalPath>/var/www/html/drupal7</drupalPath>
+            <derivative>
+              <include_file>/var/www/html/drupal7/sites/default/modules/cwrc_entities/includes/external_entities_listener.inc</include_file>
+              <include_file>/var/www/html/drupal7/sites/default/modules/cwrc_entities/includes/external_entities.inc</include_file>
+              <class>cwrc_entities_external_listener</class>
+              <classMethod>cwrc_entities_external_handler</classMethod>
+            </derivative>
+          </trigger>
+ 
+          <!-- create/update datastore for the Credit Visualization Tool-->
+          <!-- Filter on method (http://www.fedora-commons.org/documentation/3.0/userdocs/server/webservices/apim/index.html) -->
+          <trigger>
+            <method>addDatastream</method>
+            <method>addRelationship</method>
+            <method>modifyObject</method>
+            <method>modifyDatastreamByReference</method>
+            <method>modifyDatastreamByValue</method>
+            <method>ingest</method>
+            <method>purgeDatastream</method>
+            <method>purgeRelationship</method>
+            <drupalPath>/var/www/html/drupal7</drupalPath>
+            <drushScriptName>islandora_cwrc_credit_visualization_datastore</drushScriptName>
+            <derivative>
+              <include_file>/var/www/html/drupal7/sites/default/modules/islandora_cwrc_credit_visualization/includes/credit_viz_listener.inc</include_file>
+              <include_file>/var/www/html/drupal7/sites/default/modules/islandora_cwrc_credit_visualization/includes/credit_viz_listener.inc</include_file>
+              <class>islandora_cwrc_credit_visualization_listener</class>
+              <classMethod>islandora_cwrc_credit_visualization_handler</classMethod>
+            </derivative>
+          </trigger>
+
 
     </derivatives>
     
